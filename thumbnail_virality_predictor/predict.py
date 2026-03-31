@@ -25,6 +25,7 @@ def load_model(model_path=MODEL_PATH):
     model = ViralityNet(
         num_cats=len(ckpt["cat_to_idx"]),
         vocab_size=len(ckpt["vocab"]),
+        num_channels=len(ckpt["channel_to_idx"]),
     )
     model.load_state_dict(ckpt["model_state_dict"])
     model.eval()
@@ -40,6 +41,7 @@ def fetch_info(url: str) -> dict:
 def build_tensors(info: dict, ckpt: dict):
     vocab      = ckpt["vocab"]
     cat_to_idx = ckpt["cat_to_idx"]
+    chan_to_idx = ckpt["channel_to_idx"]
     num_mean   = ckpt["num_mean"]
     num_std    = ckpt["num_std"]
 
@@ -48,6 +50,8 @@ def build_tensors(info: dict, ckpt: dict):
     upload_date = info.get("upload_date", "20200101") or "20200101"
     categories  = info.get("categories", ["Unknown"]) or ["Unknown"]
     thumb_url   = info.get("thumbnail", "")
+    channel     = info.get("uploader", "Unknown")
+    sub_count   = float(info.get("channel_follower_count", 0) or 0)
 
     try:
         d   = datetime.datetime.strptime(upload_date, "%Y%m%d")
@@ -64,13 +68,17 @@ def build_tensors(info: dict, ckpt: dict):
     title_t = torch.tensor(tokens, dtype=torch.long).unsqueeze(0)
 
     # Numerical (normalized)
-    raw = np.array([duration, month, dow, title_len], dtype=np.float32)
+    raw = np.array([duration, month, dow, title_len, sub_count], dtype=np.float32)
     norm = (raw - num_mean) / num_std
     num_t = torch.tensor(norm).unsqueeze(0)
 
     # Category
     cat_idx = cat_to_idx.get(cat_str, 0)
     cat_t = torch.tensor([cat_idx], dtype=torch.long)
+
+    # Channel
+    chan_idx = chan_to_idx.get(channel, 0)
+    chan_t = torch.tensor([chan_idx], dtype=torch.long)
 
     # Image
     try:
@@ -80,7 +88,7 @@ def build_tensors(info: dict, ckpt: dict):
     except Exception:
         img_t = torch.zeros(1, 3, 224, 224)
 
-    return img_t, title_t, num_t, cat_t, cat_str, title
+    return img_t, title_t, num_t, cat_t, chan_t, cat_str, title
 
 
 def format_views(n):
@@ -102,15 +110,15 @@ def predict(url: str):
     print(f"Fetching video info for: {url}")
     info = fetch_info(url)
 
-    img_t, title_t, num_t, cat_t, cat_str, title = build_tensors(info, ckpt)
+    img_t, title_t, num_t, cat_t, chan_t, cat_str, title = build_tensors(info, ckpt)
 
     with torch.no_grad():
-        log_pred = model(img_t, title_t, num_t, cat_t).item()
+        log_pred = model(img_t, title_t, num_t, cat_t, chan_t).item()
 
     pred_views   = np.expm1(log_pred)
     actual_views = info.get("view_count")
 
-    print("\n" + "─" * 50)
+    print("\n" + "=" * 50)
     print(f"  Title     : {title}")
     print(f"  Category  : {cat_str}")
     print(f"  Duration  : {info.get('duration', '?')}s")
@@ -120,7 +128,7 @@ def predict(url: str):
         log_actual = np.log1p(actual_views)
         error = abs(log_pred - log_actual)
         print(f"  Actual    : {format_views(actual_views)} views  (log error: {error:.3f})")
-    print("─" * 50)
+    print("=" * 50)
 
     return {
         "title": title,

@@ -1,0 +1,11 @@
+Loading model from C:\Users\User\Desktop\School\WA\4th year\YouTube-AI-training\thumbnail_virality_predictor\virality_model.pth...
+Fetching video info for: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+==================================================
+  Title     : Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)
+  Category  : Music
+  Duration  : 213s
+  Log score : 13.2716
+  Predicted : ~580K views
+  Actual    : 1.76B views  (log error: 8.015)
+==================================================

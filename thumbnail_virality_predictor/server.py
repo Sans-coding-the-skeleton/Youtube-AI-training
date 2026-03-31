@@ -46,6 +46,7 @@ def get_model():
         _model = ViralityNet(
             num_cats=len(_ckpt["cat_to_idx"]),
             vocab_size=len(_ckpt["vocab"]),
+            num_channels=len(_ckpt["channel_to_idx"]),
         )
         _model.load_state_dict(_ckpt["model_state_dict"])
         _model.eval()
@@ -111,8 +112,9 @@ def predict():
     categories  = info.get("categories") or ["Unknown"]
     thumb_url   = info.get("thumbnail", "")
     actual_views = info.get("view_count")
-    channel     = info.get("uploader", "Unknown")
-    video_id    = info.get("id", "")
+    channel      = info.get("uploader", "Unknown")
+    sub_count    = float(info.get("channel_follower_count", 0) or 0)
+    video_id     = info.get("id", "")
 
     cat_str = categories[0] if categories else "Unknown"
 
@@ -132,6 +134,7 @@ def predict():
 
     vocab      = ckpt["vocab"]
     cat_to_idx = ckpt["cat_to_idx"]
+    chan_to_idx = ckpt["channel_to_idx"]
     num_mean   = ckpt["num_mean"]
     num_std    = ckpt["num_std"]
 
@@ -141,12 +144,15 @@ def predict():
     tokens  = [vocab.get(w, 0) for w in title_clean.split()][:20]
     title_t = torch.tensor(tokens, dtype=torch.long).unsqueeze(0)
 
-    raw   = np.array([duration, month, dow, title_len], dtype=np.float32)
+    raw   = np.array([duration, month, dow, title_len, sub_count], dtype=np.float32)
     norm  = (raw - num_mean) / num_std
     num_t = torch.tensor(norm).unsqueeze(0)
 
     cat_idx = cat_to_idx.get(cat_str, 0)
     cat_t   = torch.tensor([cat_idx], dtype=torch.long)
+
+    chan_idx = chan_to_idx.get(channel, 0)
+    chan_t   = torch.tensor([chan_idx], dtype=torch.long)
 
     try:
         resp  = requests.get(thumb_url, timeout=12)
@@ -157,7 +163,7 @@ def predict():
 
     # ── Inference ─────────────────────────────────────────────────────────────
     with torch.no_grad():
-        log_pred = model(img_t, title_t, num_t, cat_t).item()
+        log_pred = model(img_t, title_t, num_t, cat_t, chan_t).item()
 
     pred_views  = float(np.expm1(log_pred))
     percentile  = log_to_percentile(log_pred)
