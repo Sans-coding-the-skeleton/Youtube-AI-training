@@ -15,10 +15,21 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# PyInstaller / Release Artifacts
+dist/
+build/
+*.spec
+YouTubeViralityPredictor_Windows.zip
+make_release.ps1
+
 # Large Dataset Folders (preventing 2.2GB+ GitHub upload limits)
 dataset/
-thumbnail_virality_predictor/thumbnails/
+**/dataset/
+**/thumbnails/
+dataset.csv
 
-# Model Weights (Optional: remove if you use Git LFS)
+# Model Weights (Remove if you use Git LFS)
+# Note: virality_model.pth is ~6MB, but it's best to ignore to keep the repo clean.
 *.pth
 *.pt
+**/virality_model.pth

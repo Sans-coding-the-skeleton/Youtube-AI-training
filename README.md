@@ -1,5 +1,25 @@
 # YouTube Virality Predictor
 
+Binary version of the YouTube Virality Predictor and training data processing pipeline generated using PyInstaller.
+
+## How to run
+
+Command line:
+
+`YouTubeViralityPredictor.exe --h`
+
+### Requirements
+
+-   Windows 10, 11. Binaries have not been tested on other versions/OS, but feel free to try!
+-   Latest supported v14 (for Visual Studio 2017–2026)
+-   Command used for binary generation: `pyinstaller --name YouTubeViralityPredictor --onedir --add-data "virality_model.pth;." --add-data "app;app" --collect-all torch --collect-all torchvision --collect-all flask --collect-all yt_dlp --exclude-module pytest --exclude-module flake8 --exclude-module black server.py`
+
+### Note
+
+Includes a sample model. Works on a specific set of training data (with creator follower counts and thumbnails), but if you manage to get it to flag something else, let me know! You can use `YouTubeViralityPredictor.exe run --mine` (experimental) to collect false positives for me to support the development of this model! :)
+
+---
+
 This modular AI package features an advanced multimodal neural network designed to estimate and predict the exact raw view count of a YouTube video based strictly on its compiled metadata, structural patterns, and high-resolution thumbnail characteristics. 
 
 ## 🧠 Model Architecture: `ViralityNet`
