@@ -1,0 +1,18 @@
+=======================================================
+  YouTube Virality Predictor
+  http://localhost:5000
+=======================================================
+ * Serving Flask app 'server'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.241:5000
+Press CTRL+C to quit
+127.0.0.1 - - [31/Mar/2026 00:51:02] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [31/Mar/2026 00:51:19] "POST /api/predict HTTP/1.1" 200 -
+127.0.0.1 - - [31/Mar/2026 00:51:27] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [31/Mar/2026 00:51:33] "POST /api/predict HTTP/1.1" 200 -
+127.0.0.1 - - [31/Mar/2026 00:52:59] "POST /api/predict HTTP/1.1" 200 -
+127.0.0.1 - - [31/Mar/2026 01:14:53] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [31/Mar/2026 01:14:59] "POST /api/predict HTTP/1.1" 200 -
