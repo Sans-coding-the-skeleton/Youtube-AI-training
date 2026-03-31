@@ -170,7 +170,11 @@ def predict():
 
     result = {
         "title":         title,
+        "actual_views": actual_views,
+        "actual_views_fmt": format_views(actual_views) if actual_views else None,
         "channel":       channel,
+        "sub_count":     sub_count,
+        "sub_count_fmt": format_views(sub_count),
         "category":      cat_str,
         "duration":      int(duration),
         "upload_date":   upload_display,

@@ -476,6 +476,7 @@
       const metaEl = document.getElementById('meta-tags');
       metaEl.innerHTML = [
         tag('Channel', d.channel),
+        tag('Subs', d.sub_count_fmt || '0'),
         tag('Category', d.category),
         tag('Duration', formatDuration(d.duration)),
         tag('Uploaded', d.upload_date),
@@ -516,6 +517,7 @@
       // Model inputs breakdown
       document.getElementById('inputs-grid').innerHTML = [
         chip('Vision', 'Thumbnail (MobileNetV3)'),
+        chip('Creator', `${d.channel} · ${d.sub_count_fmt} subs`),
         chip('Text', `Title · ${d.title.split(' ').length} words`),
         chip('Category', d.category || '—'),
         chip('Duration', formatDuration(d.duration)),
