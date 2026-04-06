@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YouTube Virality Predictor</title>
-  <meta name="description" content="Predict YouTube video virality from thumbnail, title, and metadata using a multimodal neural network." />
+  <meta name="description"
+    content="Predict YouTube video virality from thumbnail, title, and metadata using a multimodal neural network." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
-      --bg:        #0d0d0d;
-      --surface:   #1a1a1a;
-      --surface2:  #242424;
-      --border:    #2e2e2e;
-      --text:      #e8e8e8;
-      --muted:     #888;
-      --accent:    #3b82f6;
-      --accent-h:  #60a5fa;
-      --green:     #22c55e;
-      --yellow:    #eab308;
-      --red:       #ef4444;
-      --radius:    10px;
+      --bg: #0d0d0d;
+      --surface: #1a1a1a;
+      --surface2: #242424;
+      --border: #2e2e2e;
+      --text: #e8e8e8;
+      --muted: #888;
+      --accent: #3b82f6;
+      --accent-h: #60a5fa;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --radius: 10px;
     }
 
     body {
@@ -41,12 +49,17 @@
       text-align: center;
       margin-bottom: 36px;
     }
+
     header h1 {
       font-size: 1.75rem;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
-    header h1 span { color: var(--accent); }
+
+    header h1 span {
+      color: var(--accent);
+    }
+
     header p {
       margin-top: 8px;
       color: var(--muted);
@@ -62,6 +75,7 @@
       max-width: 640px;
       margin-bottom: 36px;
     }
+
     #url-input {
       flex: 1;
       background: var(--surface);
@@ -74,8 +88,14 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    #url-input:focus { border-color: var(--accent); }
-    #url-input::placeholder { color: var(--muted); }
+
+    #url-input:focus {
+      border-color: var(--accent);
+    }
+
+    #url-input::placeholder {
+      color: var(--muted);
+    }
 
     #predict-btn {
       background: var(--accent);
@@ -90,9 +110,19 @@
       transition: background 0.2s, transform 0.1s;
       white-space: nowrap;
     }
-    #predict-btn:hover  { background: var(--accent-h); }
-    #predict-btn:active { transform: scale(0.97); }
-    #predict-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    #predict-btn:hover {
+      background: var(--accent-h);
+    }
+
+    #predict-btn:active {
+      transform: scale(0.97);
+    }
+
+    #predict-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     /* ── Status ─────────────────────────────────────── */
     #status {
@@ -102,7 +132,10 @@
       min-height: 1.2em;
       text-align: center;
     }
-    #status.error { color: var(--red); }
+
+    #status.error {
+      color: var(--red);
+    }
 
     /* ── Results card ───────────────────────────────── */
     #result-card {
@@ -114,7 +147,10 @@
       border-radius: 14px;
       overflow: hidden;
     }
-    #result-card.visible { display: block; }
+
+    #result-card.visible {
+      display: block;
+    }
 
     /* Thumbnail + meta row */
     .card-top {
@@ -129,10 +165,18 @@
       background: #111;
       position: relative;
     }
+
     @media (max-width: 560px) {
-      .card-top { flex-direction: column; }
-      .thumb-wrap { width: 100%; min-height: 180px; }
+      .card-top {
+        flex-direction: column;
+      }
+
+      .thumb-wrap {
+        width: 100%;
+        min-height: 180px;
+      }
     }
+
     #thumbnail-img {
       width: 100%;
       height: 100%;
@@ -147,17 +191,20 @@
       flex-direction: column;
       gap: 6px;
     }
+
     #video-title {
       font-size: 1rem;
       font-weight: 600;
       line-height: 1.4;
     }
+
     .meta-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
       margin-top: 4px;
     }
+
     .tag {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -166,7 +213,10 @@
       color: var(--muted);
       padding: 3px 9px;
     }
-    .tag b { color: var(--text); }
+
+    .tag b {
+      color: var(--text);
+    }
 
     /* ── Prediction section ─────────────────────────── */
     .pred-section {
@@ -186,6 +236,7 @@
       flex: 1;
       min-width: 160px;
     }
+
     .pred-label {
       font-size: 0.75rem;
       text-transform: uppercase;
@@ -193,12 +244,14 @@
       color: var(--muted);
       margin-bottom: 4px;
     }
+
     .pred-value {
       font-size: 2.4rem;
       font-weight: 700;
       color: var(--accent);
       line-height: 1;
     }
+
     .pred-range {
       font-size: 0.82rem;
       color: var(--muted);
@@ -208,21 +261,27 @@
     .pred-actual {
       min-width: 140px;
     }
+
     .pred-actual .pred-value {
       font-size: 1.6rem;
       color: var(--green);
     }
+
     .log-error {
       font-size: 0.78rem;
       color: var(--muted);
       margin-top: 4px;
     }
-    .log-error b { color: var(--text); }
+
+    .log-error b {
+      color: var(--text);
+    }
 
     /* ── Percentile bar ─────────────────────────────── */
     .percentile-row {
       margin-bottom: 16px;
     }
+
     .bar-header {
       display: flex;
       justify-content: space-between;
@@ -230,7 +289,11 @@
       color: var(--muted);
       margin-bottom: 6px;
     }
-    .bar-header b { color: var(--text); }
+
+    .bar-header b {
+      color: var(--text);
+    }
+
     .bar-bg {
       height: 8px;
       background: var(--surface2);
@@ -238,12 +301,14 @@
       overflow: visible;
       position: relative;
     }
+
     .bar-fill {
       height: 100%;
       border-radius: 99px;
-      transition: width 0.8s cubic-bezier(.4,0,.2,1);
+      transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
       position: relative;
     }
+
     .bar-marker {
       position: absolute;
       right: -1px;
@@ -256,12 +321,29 @@
     }
 
     /* Bar colour based on percentile */
-    .bar-low  .bar-fill { background: var(--red); }
-    .bar-low  .bar-marker { background: var(--red); }
-    .bar-mid  .bar-fill { background: var(--yellow); }
-    .bar-mid  .bar-marker { background: var(--yellow); }
-    .bar-high .bar-fill { background: var(--green); }
-    .bar-high .bar-marker { background: var(--green); }
+    .bar-low .bar-fill {
+      background: var(--red);
+    }
+
+    .bar-low .bar-marker {
+      background: var(--red);
+    }
+
+    .bar-mid .bar-fill {
+      background: var(--yellow);
+    }
+
+    .bar-mid .bar-marker {
+      background: var(--yellow);
+    }
+
+    .bar-high .bar-fill {
+      background: var(--green);
+    }
+
+    .bar-high .bar-marker {
+      background: var(--green);
+    }
 
     .bar-labels {
       display: flex;
@@ -282,13 +364,17 @@
       color: var(--muted);
       line-height: 1.5;
     }
-    .disclaimer b { color: var(--text); }
+
+    .disclaimer b {
+      color: var(--text);
+    }
 
     /* ── Model inputs breakdown ─────────────────────── */
     .inputs-section {
       border-top: 1px solid var(--border);
       padding: 16px 24px;
     }
+
     .inputs-title {
       font-size: 0.75rem;
       text-transform: uppercase;
@@ -296,11 +382,13 @@
       color: var(--muted);
       margin-bottom: 10px;
     }
+
     .inputs-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 8px;
     }
+
     .input-chip {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -308,39 +396,49 @@
       padding: 8px 12px;
       font-size: 0.78rem;
     }
-    .input-chip .ic-label { color: var(--muted); margin-bottom: 2px; }
-    .input-chip .ic-value { color: var(--text); font-weight: 500; }
+
+    .input-chip .ic-label {
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .input-chip .ic-value {
+      color: var(--text);
+      font-weight: 500;
+    }
 
     /* ── Spinner ─────────────────────────────────────── */
     .spinner {
       display: inline-block;
       width: 14px;
       height: 14px;
-      border: 2px solid rgba(255,255,255,0.2);
+      border: 2px solid rgba(255, 255, 255, 0.2);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       vertical-align: middle;
       margin-right: 6px;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
   </style>
 </head>
+
 <body>
 
   <header>
     <h1>YouTube <span>Virality</span> Predictor</h1>
-    <p>Paste any YouTube URL to predict how viral a video's content is, based on its thumbnail, title, category, and duration.</p>
+    <p>Paste any YouTube URL to predict how viral a video's content is, based on its thumbnail, title, category, and
+      duration.</p>
   </header>
 
   <div class="search-box">
-    <input
-      id="url-input"
-      type="url"
-      placeholder="https://www.youtube.com/watch?v=..."
-      autocomplete="off"
-      spellcheck="false"
-    />
+    <input id="url-input" type="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off"
+      spellcheck="false" />
     <button id="predict-btn" onclick="runPrediction()">Predict</button>
   </div>
 
@@ -396,7 +494,9 @@
 
       <!-- Disclaimer -->
       <div class="disclaimer">
-        <b>What this score means:</b> The model estimates how this video's content (thumbnail visuals, title wording, category, duration) compares to ~3,900 YouTube videos in our training dataset. It is <b>not</b> a time-bound forecast — it reflects the overall "virality potential" of the content relative to observed view counts.
+        <b>What this score means:</b> The model estimates how this video's content (thumbnail visuals, title wording,
+        category, duration) compares to ~3,900 YouTube videos in our training dataset. It is <b>not</b> a time-bound
+        forecast — it reflects the overall "virality potential" of the content relative to observed view counts.
       </div>
     </div>
 
@@ -409,7 +509,7 @@
   </div>
 
   <script>
-    const input  = document.getElementById('url-input');
+    const input = document.getElementById('url-input');
     const status = document.getElementById('status');
 
     // Allow Enter key
@@ -502,7 +602,7 @@
       // Percentile bar
       const pct = d.percentile;
       document.getElementById('percentile-val').textContent = pct.toFixed(1);
-      const barBg   = document.getElementById('bar-bg');
+      const barBg = document.getElementById('bar-bg');
       const barFill = document.getElementById('bar-fill');
 
       barBg.className = 'bar-bg ' + (pct < 33 ? 'bar-low' : pct < 66 ? 'bar-mid' : 'bar-high');
@@ -518,7 +618,6 @@
       document.getElementById('inputs-grid').innerHTML = [
         chip('Vision', 'Thumbnail (MobileNetV3)'),
         chip('Creator', `${d.channel} · ${d.sub_count_fmt} subs`),
-
         chip('Category', d.category || '—'),
         chip('Duration', formatDuration(d.duration)),
         chip('Upload month', d.upload_date ? d.upload_date.split(' ')[0] : '—'),
@@ -528,8 +627,9 @@
       document.getElementById('result-card').classList.add('visible');
     }
 
-    const tag  = (lbl, val) => `<div class="tag"><span style="color:var(--muted)">${lbl}: </span><b>${val || '—'}</b></div>`;
+    const tag = (lbl, val) => `<div class="tag"><span style="color:var(--muted)">${lbl}: </span><b>${val || '—'}</b></div>`;
     const chip = (lbl, val) => `<div class="input-chip"><div class="ic-label">${lbl}</div><div class="ic-value">${val}</div></div>`;
   </script>
 </body>
+
 </html>
