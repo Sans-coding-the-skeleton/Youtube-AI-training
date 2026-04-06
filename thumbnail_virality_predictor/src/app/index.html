@@ -518,7 +518,7 @@
       document.getElementById('inputs-grid').innerHTML = [
         chip('Vision', 'Thumbnail (MobileNetV3)'),
         chip('Creator', `${d.channel} · ${d.sub_count_fmt} subs`),
-        chip('Text', `Title semantics (GRU)`),
+
         chip('Category', d.category || '—'),
         chip('Duration', formatDuration(d.duration)),
         chip('Upload month', d.upload_date ? d.upload_date.split(' ')[0] : '—'),
