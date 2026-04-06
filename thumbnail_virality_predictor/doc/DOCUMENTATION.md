@@ -1,14 +1,5 @@
 # YouTube Virality Predictor - Documentation
 
-**Project Name:** YouTube Thumbnail Virality Predictor  
-**Author:** [Your Name]  
-**Contact:** [Your Contact / Email]  
-**Date:** April 2026  
-**School:** [Your School]  
-**Note:** This is a School Project  
-
----
-
 ## 1. Project Specifications (Functional Requirements)
 The goal of this application is to estimate the virality (view count potential) of a given YouTube video by analyzing its thumbnail image, title text, category, and metadata.
 - Users can input a YouTube URL into a Web UI.
