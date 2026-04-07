@@ -21,6 +21,13 @@ MODEL_PATH = Path(__file__).parent / "virality_model.pth"
 
 
 def load_model(model_path=MODEL_PATH):
+    """
+    Loads the trained ViralityNet model from the specified checkpoint path.
+    
+    This function reads the saved PyTorch weights and vocabulary/category mappings
+    from the checkpoint to reconstruct the exact model architecture used during
+    training. It sets the model to evaluation mode before returning.
+    """
     ckpt = torch.load(model_path, map_location="cpu", weights_only=False)
     model = ViralityNet(
         num_cats=len(ckpt["cat_to_idx"]),
@@ -33,12 +40,28 @@ def load_model(model_path=MODEL_PATH):
 
 
 def fetch_info(url: str) -> dict:
+    """
+    Retrieves metadata for a given YouTube video URL without downloading the video.
+    
+    Uses yt-dlp to extract structural information such as title, channel name,
+    duration, upload date, categories, and the thumbnail URL.
+    """
     ydl_opts = {"quiet": True, "no_warnings": True, "skip_download": True}
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         return ydl.extract_info(url, download=False)
 
 
 def build_tensors(info: dict, ckpt: dict):
+    """
+    Converts raw video metadata into structured PyTorch tensors for the model.
+    
+    This handles multiple modalities:
+    1. Text: Tokenizes the title based on the training vocabulary.
+    2. Numerical: Normalizes numeric stats (duration, upload date, channel subs)
+       using the means and standard deviations derived from the dataset.
+    3. Categorical: Maps category and channel strings to learned integer indices.
+    4. Image: Downloads the thumbnail image and applies pre-processing transforms.
+    """
     vocab      = ckpt["vocab"]
     cat_to_idx = ckpt["cat_to_idx"]
     chan_to_idx = ckpt["channel_to_idx"]
@@ -92,6 +115,12 @@ def build_tensors(info: dict, ckpt: dict):
 
 
 def format_views(n):
+    """
+    Formats a raw numerical view count into a human-readable abbreviated string.
+    
+    Converts large numbers into millions (M), billions (B), or thousands (K)
+    for cleaner terminal output.
+    """
     if n >= 1e9:  return f"{n/1e9:.2f}B"
     if n >= 1e6:  return f"{n/1e6:.2f}M"
     if n >= 1e3:  return f"{n/1e3:.0f}K"
@@ -99,6 +128,13 @@ def format_views(n):
 
 
 def predict(url: str):
+    """
+    Orchestrates the complete prediction pipeline for a single YouTube URL.
+    
+    It checks for a trained model, fetches video metadata using yt-dlp, converts
+    the metadata to tensors, passes them through the ViralityNet model, and then
+    inverses the log scale to print the predicted view count in a readable format.
+    """
     if not MODEL_PATH.exists():
         print(f"[ERROR] No trained model found at {MODEL_PATH}")
         print("Run train.py first.")
